@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // AppleDouble sidecars created when the repo lives on a non-HFS volume.
+    "**/._*",
   ]),
 ]);
 
