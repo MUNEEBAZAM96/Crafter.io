@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { site } from "@/lib/content";
+import { apps, contact, founder, site, social } from "@/lib/data";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,10 +15,12 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const title = `${site.name} — ${site.headline}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Building apps that make a difference`,
+    default: title,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -32,20 +34,22 @@ export const metadata: Metadata = {
     "Revive app",
     "Hydro app",
     "Pakistan app studio",
+    "Muneeb Azam",
   ],
-  authors: [{ name: site.name, url: site.url }],
-  creator: site.name,
+  authors: [{ name: founder.name }],
+  creator: founder.name,
+  publisher: site.name,
   openGraph: {
     type: "website",
     url: site.url,
     siteName: site.name,
-    title: `${site.name} — Building apps that make a difference`,
+    title,
     description: site.description,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — Building apps that make a difference`,
+    title,
     description: site.description,
   },
   robots: {
@@ -65,8 +69,9 @@ export const viewport: Viewport = {
 };
 
 /**
- * Structured data so search engines resolve Crafter.io as an organisation
- * with a product catalogue rather than a generic page.
+ * Structured data so search engines resolve Crafter.io as an organisation with
+ * a named founder and a product catalogue, rather than a generic page.
+ * `sameAs` is omitted entirely when no external profile is configured.
  */
 const jsonLd = {
   "@context": "https://schema.org",
@@ -74,8 +79,33 @@ const jsonLd = {
   name: site.name,
   url: site.url,
   description: site.description,
-  email: site.email,
-  sameAs: [site.social.linkedin, site.social.playStore],
+  slogan: site.tagline,
+  email: contact.email,
+  telephone: contact.phone,
+  founder: {
+    "@type": "Person",
+    name: founder.name,
+    jobTitle: founder.role,
+    description: founder.bio,
+    ...(social.linkedin ? { sameAs: [social.linkedin] } : {}),
+  },
+  ...(social.playStore || social.linkedin
+    ? {
+        sameAs: [social.linkedin, social.playStore].filter(
+          (url): url is string => Boolean(url),
+        ),
+      }
+    : {}),
+  makesOffer: apps.map((app) => ({
+    "@type": "Offer",
+    itemOffered: {
+      "@type": "MobileApplication",
+      name: app.name,
+      description: app.description,
+      applicationCategory: app.category,
+      operatingSystem: app.platform,
+    },
+  })),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -84,7 +114,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         {children}
         <script
           type="application/ld+json"

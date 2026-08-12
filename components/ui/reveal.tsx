@@ -1,7 +1,41 @@
 "use client";
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ElementType,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/cn";
+
+/**
+ * One IntersectionObserver shared by every Reveal on the page.
+ *
+ * The page mounts ~50 of these; giving each its own observer is measurable
+ * overhead for no benefit, since they all watch with identical options.
+ */
+const callbacks = new WeakMap<Element, () => void>();
+let observer: IntersectionObserver | null = null;
+
+function getObserver(): IntersectionObserver | null {
+  if (typeof IntersectionObserver === "undefined") return null;
+
+  observer ??= new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        callbacks.get(entry.target)?.();
+        callbacks.delete(entry.target);
+        observer?.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -10% 0px" },
+  );
+
+  return observer;
+}
 
 type RevealProps = {
   children: ReactNode;
@@ -14,6 +48,9 @@ type RevealProps = {
 /**
  * Fades and lifts children into view once, on first intersection.
  * Reduced-motion users get the settled state immediately (handled in CSS).
+ *
+ * For above-the-fold content use the `enter` utility instead — it animates
+ * from CSS alone and keeps the section a Server Component.
  */
 export function Reveal({
   children,
@@ -28,32 +65,29 @@ export function Reveal({
     const node = ref.current;
     if (!node) return;
 
-    // Guard against environments without IntersectionObserver: settle on the
-    // next frame so content is never left invisible.
-    if (typeof IntersectionObserver === "undefined") {
+    const io = getObserver();
+
+    // No IntersectionObserver: settle on the next frame so content is never
+    // left invisible.
+    if (!io) {
       const frame = requestAnimationFrame(() => setVisible(true));
       return () => cancelAnimationFrame(frame);
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
-    );
+    callbacks.set(node, () => setVisible(true));
+    io.observe(node);
 
-    observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      callbacks.delete(node);
+      io.unobserve(node);
+    };
   }, []);
 
   return (
     <Tag
       ref={ref}
       className={cn("reveal", visible && "is-visible", className)}
-      style={{ "--reveal-delay": `${delay}ms` } as React.CSSProperties}
+      style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}
     >
       {children}
     </Tag>

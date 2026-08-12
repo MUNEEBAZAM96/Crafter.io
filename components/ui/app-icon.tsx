@@ -1,5 +1,5 @@
 import { AudioLines, Droplets, Sprout, type LucideIcon } from "lucide-react";
-import type { App } from "@/lib/content";
+import type { App } from "@/lib/data";
 import { cn } from "@/lib/cn";
 
 const glyphs: Record<App["slug"], LucideIcon> = {

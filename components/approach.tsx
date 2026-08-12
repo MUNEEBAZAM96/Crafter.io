@@ -1,4 +1,4 @@
-import { approach } from "@/lib/content";
+import { approach } from "@/lib/data";
 import { Container, SectionHeading } from "./ui/section";
 import { Reveal } from "./ui/reveal";
 
@@ -6,13 +6,13 @@ export function Approach() {
   return (
     <section
       id="approach"
-      className="border-y border-line bg-elevated py-20 sm:py-28"
+      className="py-20 sm:py-28"
     >
       <Container>
         <SectionHeading
-          eyebrow="How we work"
-          title="Our approach"
-          subtitle="Four steps, repeated until the product is genuinely useful."
+          eyebrow="Process"
+          title="How We Build"
+          subtitle="Four stages, repeated until the product is genuinely useful."
         />
 
         <ol className="relative mt-14 grid gap-5 lg:grid-cols-4">

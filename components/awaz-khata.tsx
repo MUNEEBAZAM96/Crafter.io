@@ -1,5 +1,6 @@
+import type { CSSProperties } from "react";
 import { Quote } from "lucide-react";
-import { awazKhataFeatures, featuredApp } from "@/lib/content";
+import { awazKhataFeatures, featuredApp } from "@/lib/data";
 import { icons, type IconName } from "@/lib/icons";
 import { Container, Eyebrow } from "./ui/section";
 import { Reveal } from "./ui/reveal";
@@ -7,12 +8,14 @@ import { AppIcon } from "./ui/app-icon";
 import { GooglePlayButton } from "./ui/google-play-button";
 import { Phone } from "./ui/phone";
 import { AwazKhataScreen } from "./ui/app-screens";
+import { TiltCard } from "./motion/tilt-card";
+import { Magnetic } from "./motion/magnetic";
 
 export function AwazKhata() {
   return (
     <section
       id="awaz-khata"
-      className="relative overflow-hidden border-y border-line bg-elevated py-20 sm:py-28"
+      className="relative overflow-hidden py-20 sm:py-28"
     >
       <div
         aria-hidden
@@ -41,11 +44,11 @@ export function AwazKhata() {
           </p>
 
           <p className="mt-5 text-pretty text-lg leading-relaxed text-ink-soft">
-            Awaz Khata is a voice-first finance assistant designed around the way
-            Pakistani users naturally communicate. Instead of forcing people
+            Awaz Khata is a voice-first finance assistant designed around the
+            way Pakistani users naturally communicate. Instead of forcing people
             through forms and dropdowns, it listens — in Urdu, Roman Urdu,
-            English or the mix of all three that real conversations are made of —
-            and turns what it hears into a clean, structured ledger.
+            English or the mix of all three that real conversations are made of
+            — and turns what it hears into a clean, structured ledger.
           </p>
         </Reveal>
 
@@ -59,9 +62,18 @@ export function AwazKhata() {
                 aria-hidden
                 className="absolute inset-x-6 top-10 bottom-10 rounded-[3rem] bg-accent/10 blur-3xl"
               />
-              <Phone className="relative animate-float sm:max-w-[17rem]">
-                <AwazKhataScreen />
-              </Phone>
+              {/* Tilt sits inside the Reveal, never on the sticky ancestor —
+                  the two would fight over `transform`. */}
+              <TiltCard intensity={5} highlight={false} className="relative">
+                <Phone className="animate-float sm:max-w-[17rem]">
+                  <div
+                    className="depth-layer h-full"
+                    style={{ "--depth": "7px" } as CSSProperties}
+                  >
+                    <AwazKhataScreen />
+                  </div>
+                </Phone>
+              </TiltCard>
             </Reveal>
           </div>
 
@@ -112,27 +124,42 @@ export function AwazKhata() {
                 </blockquote>
                 <figcaption className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4 text-sm text-ink-soft">
                   <span className="text-ink-muted">Recorded as</span>
-                  {["Credit given", "Rs 2,000", "Aslam", "Udhaar"].map((chip) => (
-                    <span
-                      key={chip}
-                      className="rounded-full bg-accent-soft px-2.5 py-1 text-[0.75rem] font-medium text-accent-ink"
-                    >
-                      {chip}
-                    </span>
-                  ))}
+                  {["Credit given", "Rs 2,000", "Aslam", "Udhaar"].map(
+                    (chip) => (
+                      <span
+                        key={chip}
+                        className="rounded-full bg-accent-soft px-2.5 py-1 text-[0.75rem] font-medium text-accent-ink"
+                      >
+                        {chip}
+                      </span>
+                    ),
+                  )}
                 </figcaption>
               </figure>
             </Reveal>
 
-            <Reveal delay={160} className="mt-8">
-              <GooglePlayButton
-                url={featuredApp.playStoreUrl}
-                variant="full"
-                className="w-full justify-center sm:w-auto sm:justify-start"
-              />
-              <p className="mt-3 text-sm text-ink-muted">
-                View on Google Play — available for Android.
+            <Reveal delay={160} className="mt-8 border-t border-line pt-8">
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">
+                Built with
               </p>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {featuredApp.tech.map((tech) => (
+                  <li
+                    key={tech}
+                    className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-[0.8125rem] font-medium text-ink-soft transition-colors duration-200 hover:border-line-strong hover:text-ink"
+                  >
+                    {tech}
+                  </li>
+                ))}
+              </ul>
+
+              <Magnetic className="mt-6 w-full sm:w-auto">
+                <GooglePlayButton
+                  url={featuredApp.playStoreUrl}
+                  variant="full"
+                  className="w-full justify-center sm:w-auto sm:justify-start"
+                />
+              </Magnetic>
             </Reveal>
           </div>
         </div>

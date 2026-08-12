@@ -1,4 +1,4 @@
-import { site } from "@/lib/content";
+import { social } from "@/lib/data";
 import { cn } from "@/lib/cn";
 
 function PlayGlyph({ className }: { className?: string }) {
@@ -12,9 +12,21 @@ function PlayGlyph({ className }: { className?: string }) {
   );
 }
 
+type GooglePlayButtonProps = {
+  /** A specific listing URL. Falls back to the studio's developer page. */
+  url?: string | null;
+  label?: string;
+  variant?: "compact" | "full";
+  /** `onDark` restyles the button for the dark flagship/CTA panels. */
+  tone?: "default" | "onDark";
+  className?: string;
+};
+
 /**
- * Falls back to the studio's developer page when an individual listing URL
- * isn't known yet, so the CTA is never a dead end.
+ * Renders nothing when neither a listing URL nor the studio developer page is
+ * configured — an unpublished app shows no Play Store CTA rather than a link
+ * to a page that doesn't exist. Set NEXT_PUBLIC_PLAY_STORE_URL or the app's
+ * `playStoreUrl` to switch it on.
  */
 export function GooglePlayButton({
   url,
@@ -22,16 +34,9 @@ export function GooglePlayButton({
   variant = "compact",
   tone = "default",
   className,
-}: {
-  url?: string | null;
-  label?: string;
-  variant?: "compact" | "full";
-  /** `onDark` restyles the button for the dark flagship/CTA panels. */
-  tone?: "default" | "onDark";
-  className?: string;
-}) {
-  const href = url ?? site.social.playStore;
-  const onDark = tone === "onDark";
+}: GooglePlayButtonProps) {
+  const href = url ?? social.playStore;
+  if (!href) return null;
 
   if (variant === "full") {
     return (
@@ -41,7 +46,7 @@ export function GooglePlayButton({
         rel="noopener noreferrer"
         className={cn(
           "group inline-flex items-center gap-3 rounded-2xl border border-line-strong bg-surface px-5 py-3",
-          "transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-muted hover:shadow-md",
+          "transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-ink-muted hover:shadow-md",
           className,
         )}
       >
@@ -50,7 +55,9 @@ export function GooglePlayButton({
           <span className="text-[0.6875rem] uppercase tracking-wide text-ink-muted">
             Get it on
           </span>
-          <span className="text-[0.9375rem] font-semibold text-ink">Google Play</span>
+          <span className="text-[0.9375rem] font-semibold text-ink">
+            Google Play
+          </span>
         </span>
       </a>
     );
@@ -64,7 +71,7 @@ export function GooglePlayButton({
       className={cn(
         "inline-flex h-9 items-center gap-2 rounded-full border px-3.5",
         "text-sm font-medium transition-colors duration-200",
-        onDark
+        tone === "onDark"
           ? "border-white/15 bg-white/5 text-white/80 hover:border-white/30 hover:text-white"
           : "border-line-strong bg-surface text-ink-soft hover:border-ink-muted hover:text-ink",
         className,

@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Crafter.io
 
-## Getting Started
+Marketing site for Crafter.io — an independent app studio building mobile
+applications and AI-powered experiences.
 
-First, run the development server:
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4. The whole
+site is one statically-prerendered page.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # optional, see Configuration
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Script          | What it does                      |
+| --------------- | --------------------------------- |
+| `npm run dev`   | Dev server                        |
+| `npm run build` | Production build                  |
+| `npm run start` | Serve the production build        |
+| `npm run lint`  | ESLint (flat config)              |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Typecheck with `npx tsc --noEmit`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Editing the site
 
-## Learn More
+**All copy, links and product data live in `lib/data/`** — components read from
+it and never hardcode content.
 
-To learn more about Next.js, take a look at the following resources:
+| File         | Contains                                                        |
+| ------------ | --------------------------------------------------------------- |
+| `site.ts`    | Company identity, contact details, founder profile, navigation   |
+| `apps.ts`    | The product catalogue and the Revive case study                  |
+| `company.ts` | Intro statement, the four build stages, the technology list      |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Adding a new app
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Append an object to `apps` in `lib/data/apps.ts`.
+2. Add a matching entry to the `screens` registry in
+   `components/ui/app-screens.tsx` (the phone mockup).
 
-## Deploy on Vercel
+The apps grid, projects index, hero card stack, footer and structured data all
+derive from that array — nothing else needs changing.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Copy `.env.example` to `.env.local`. Every variable is optional, and the UI
+**hides** the corresponding link when one is unset rather than rendering a
+placeholder or a broken URL.
+
+| Variable                     | Effect when unset                                  |
+| ---------------------------- | -------------------------------------------------- |
+| `NEXT_PUBLIC_LINKEDIN_URL`   | Every "Connect on LinkedIn" button is hidden        |
+| `NEXT_PUBLIC_PLAY_STORE_URL` | Play Store buttons without a listing URL are hidden |
+| `NEXT_PUBLIC_SITE_URL`       | Canonical/OG URLs fall back to `https://crafter.io` |
+
+Per-app Play Store listing URLs live in `apps.ts` as `playStoreUrl`. An app
+with `playStoreUrl: null` shows no Play Store CTA, and its `status` should stay
+`"In development"` until it is genuinely published.
+
+## Content rules
+
+The site deliberately contains **no invented data** — no download counts,
+ratings, user numbers, testimonials, awards or partnerships, and no claim that
+an app is published while it isn't. Add real figures only when you have them.
+
+Revive touches addiction recovery, so its copy stays non-clinical and its
+`disclaimer` field ("a self-help support tool, not medical care…") renders
+anywhere the app is described at length.
+
+App mockups are CSS-drawn design references, not screenshots, and the UI says
+so where it shows them.
+
+## Notes
+
+Further architectural detail — design tokens, the two animation systems,
+accessibility and layout constraints — is in `CLAUDE.md`.

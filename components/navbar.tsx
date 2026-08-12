@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Menu, X } from "lucide-react";
-import { navLinks } from "@/lib/content";
+import { contact, mailto, navLinks } from "@/lib/data";
+import { HERO_SEQUENCE } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "./ui/button";
 import { Logo } from "./ui/logo";
+import { Magnetic } from "./motion/magnetic";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("#home");
 
-  // Condense the bar once the hero starts leaving the viewport.
+  // Condense the bar once the page starts moving.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -63,30 +65,36 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled
-          ? "border-b border-line bg-canvas/85 backdrop-blur-xl"
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300",
+        scrolled || open
+          ? "border-b border-line bg-canvas/80 backdrop-blur-xl backdrop-saturate-150"
           : "border-b border-transparent",
       )}
     >
+      {/* The entrance sits on the nav, not the fixed header: animating the
+          header would leave `will-change` on a permanently-composited bar. */}
       <nav
         aria-label="Main"
-        className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-5 sm:h-[4.5rem] sm:px-8"
+        style={{ "--enter-delay": `${HERO_SEQUENCE.navbar}ms` } as CSSProperties}
+        className={cn(
+          "enter mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 transition-[height] duration-300 sm:px-8",
+          scrolled ? "h-14 sm:h-16" : "h-16 sm:h-20",
+        )}
       >
         <a
           href="#home"
-          className="rounded-lg transition-opacity hover:opacity-80"
+          className="rounded-lg transition-opacity duration-200 hover:opacity-70"
           aria-label="Crafter.io — home"
         >
           <Logo />
         </a>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        <ul className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                aria-current={active === link.href ? "true" : undefined}
+                aria-current={active === link.href ? "page" : undefined}
                 className={cn(
                   "relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors duration-200",
                   active === link.href
@@ -98,7 +106,7 @@ export function Navbar() {
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute inset-x-3.5 -bottom-0.5 h-px origin-left bg-accent transition-transform duration-300",
+                    "absolute inset-x-3.5 -bottom-0.5 h-px origin-left bg-accent transition-transform duration-300 ease-out",
                     active === link.href ? "scale-x-100" : "scale-x-0",
                   )}
                 />
@@ -108,9 +116,11 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <ButtonLink href="#apps" size="sm" className="hidden sm:inline-flex">
-            Explore Our Apps
-          </ButtonLink>
+          <Magnetic className="hidden sm:inline-flex">
+            <ButtonLink href="#contact" size="sm">
+              Let&apos;s Talk
+            </ButtonLink>
+          </Magnetic>
 
           <button
             type="button"
@@ -118,39 +128,64 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="grid size-10 place-items-center rounded-full border border-line-strong text-ink transition-colors hover:bg-elevated lg:hidden"
+            className="grid size-10 place-items-center rounded-full border border-line-strong text-ink transition-colors duration-200 hover:bg-elevated md:hidden"
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile sheet */}
+      {/* ---- Mobile sheet ----
+          Stays mounted so it can animate; `inert` keeps the closed panel out
+          of the tab order and the accessibility tree. */}
       <div
         id="mobile-menu"
-        hidden={!open}
-        className="border-t border-line bg-canvas lg:hidden"
+        inert={!open}
+        className={cn(
+          "absolute inset-x-0 top-full origin-top border-b border-line bg-canvas/95 backdrop-blur-xl md:hidden",
+          "transition-[opacity,transform] duration-300 ease-out",
+          open
+            ? "pointer-events-auto opacity-100 translate-y-0"
+            : "pointer-events-none -translate-y-2 opacity-0",
+        )}
       >
-        <ul className="mx-auto flex max-w-6xl flex-col px-5 py-3 sm:px-8">
-          {navLinks.map((link) => (
+        <ul className="mx-auto flex max-w-6xl flex-col px-5 py-4 sm:px-8">
+          {navLinks.map((link, i) => (
             <li key={link.href}>
               <a
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="block border-b border-line py-3.5 text-[0.9375rem] font-medium text-ink-soft transition-colors hover:text-ink"
+                style={{ transitionDelay: open ? `${60 + i * 40}ms` : "0ms" }}
+                className={cn(
+                  "flex items-center justify-between border-b border-line py-4 text-base font-medium",
+                  "transition-[opacity,transform] duration-300 ease-out",
+                  active === link.href ? "text-ink" : "text-ink-soft",
+                  open ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
+                )}
               >
                 {link.label}
+                {active === link.href ? (
+                  <span aria-hidden className="size-1.5 rounded-full bg-accent" />
+                ) : null}
               </a>
             </li>
           ))}
-          <li className="pt-4 pb-2">
+
+          <li className="flex flex-col gap-2 pt-5 pb-2">
             <ButtonLink
-              href="#apps"
+              href="#contact"
               onClick={() => setOpen(false)}
               className="w-full"
             >
-              Explore Our Apps
+              Let&apos;s Talk
             </ButtonLink>
+            <a
+              href={mailto}
+              onClick={() => setOpen(false)}
+              className="text-center text-sm text-ink-muted transition-colors duration-200 hover:text-ink"
+            >
+              {contact.email}
+            </a>
           </li>
         </ul>
       </div>

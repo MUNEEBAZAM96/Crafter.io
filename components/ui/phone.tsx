@@ -5,6 +5,9 @@ import { cn } from "@/lib/cn";
  * Pure-CSS device frame. Keeps mockups dependency-free and crisp at any DPI,
  * with no screenshot assets to maintain.
  */
+/** Which status-bar / home-indicator colour keeps contrast on the screen. */
+export type PhoneTone = "dark" | "light";
+
 export function Phone({
   children,
   className,
@@ -14,7 +17,7 @@ export function Phone({
   children: ReactNode;
   className?: string;
   statusBarTime?: string;
-  tone?: "dark" | "light";
+  tone?: PhoneTone;
 }) {
   return (
     <div

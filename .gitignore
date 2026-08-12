@@ -33,6 +33,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template documents which variables exist, so it ships.
+!.env.example
 
 # vercel
 .vercel

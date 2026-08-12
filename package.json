@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "clean:appledouble": "find .next -name '._*' -delete 2>/dev/null || true",
+    "prebuild": "npm run clean:appledouble",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

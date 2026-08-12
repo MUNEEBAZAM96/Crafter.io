@@ -1,5 +1,7 @@
-import { aboutFocus, apps } from "@/lib/content";
+import { aboutFocus, aboutStatement, apps } from "@/lib/data";
+import { STAGGER } from "@/lib/motion";
 import { icons, type IconName } from "@/lib/icons";
+import { cn } from "@/lib/cn";
 import { Container, Eyebrow } from "./ui/section";
 import { Reveal } from "./ui/reveal";
 import { AppIcon } from "./ui/app-icon";
@@ -12,10 +14,29 @@ export function About() {
           <div>
             <Reveal>
               <Eyebrow>About us</Eyebrow>
-              <h2 className="mt-6 text-balance text-3xl font-semibold tracking-[-0.02em] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-                A studio built around useful software.
-              </h2>
-              <p className="mt-6 text-pretty text-lg leading-relaxed text-ink-soft">
+            </Reveal>
+
+            {/* Each line lands on its own as the section scrolls in. The last
+                line carries the accent, so the statement resolves rather than
+                just stopping. */}
+            <h2 className="mt-6 text-balance text-3xl font-semibold tracking-[-0.02em] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
+              {aboutStatement.map((line, i) => (
+                <Reveal
+                  as="span"
+                  key={line}
+                  delay={i * STAGGER}
+                  className={cn(
+                    "block",
+                    i === aboutStatement.length - 1 && "text-accent-ink",
+                  )}
+                >
+                  {line}
+                </Reveal>
+              ))}
+            </h2>
+
+            <Reveal delay={STAGGER * 3}>
+              <p className="mt-8 text-pretty text-lg leading-relaxed text-ink-soft">
                 Crafter.io is a technology startup focused on designing and
                 building mobile applications that combine thoughtful UX, modern
                 technology and practical problem solving.
@@ -23,12 +44,12 @@ export function About() {
               <p className="mt-4 text-pretty leading-relaxed text-ink-soft">
                 We work in small, focused cycles: find a problem people actually
                 have, design the shortest path through it, and ship something
-                real. Every product we release has to earn its place on someone&apos;s
-                home screen.
+                real. Every product we release has to earn its place on
+                someone&apos;s home screen.
               </p>
             </Reveal>
 
-            <Reveal delay={120}>
+            <Reveal delay={STAGGER * 4}>
               <ul className="mt-9 flex flex-wrap gap-2.5">
                 {aboutFocus.map((focus) => {
                   const Icon = icons[focus.icon as IconName];
@@ -59,7 +80,7 @@ export function About() {
               />
 
               <p className="relative text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-                What we&apos;ve shipped
+                What we&apos;re building
               </p>
 
               <ul className="relative mt-5 divide-y divide-line">
@@ -75,15 +96,15 @@ export function About() {
                       </p>
                     </div>
                     <span className="hidden shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-[0.6875rem] font-medium text-accent-ink sm:block">
-                      {app.platform}
+                      {app.subtitle}
                     </span>
                   </li>
                 ))}
               </ul>
 
               <p className="relative mt-5 border-t border-line pt-5 text-sm leading-relaxed text-ink-muted">
-                Mobile-first products, built end to end — design, engineering and
-                release.
+                Mobile-first products, built end to end — design, engineering
+                and release.
               </p>
             </div>
           </Reveal>

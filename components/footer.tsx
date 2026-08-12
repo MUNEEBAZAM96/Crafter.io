@@ -1,11 +1,14 @@
-import { apps, navLinks, site } from "@/lib/content";
+import { apps, contact, mailto, navLinks, site, social, telHref } from "@/lib/data";
 import { Container } from "./ui/section";
 import { Logo } from "./ui/logo";
 
+/** External destinations are omitted entirely when their URL isn't configured. */
 const externalLinks = [
-  { label: "LinkedIn", href: site.social.linkedin },
-  { label: "Google Play", href: site.social.playStore },
-];
+  social.linkedin ? { label: "LinkedIn", href: social.linkedin } : null,
+  social.playStore ? { label: "Google Play", href: social.playStore } : null,
+].filter((link): link is { label: string; href: string } => link !== null);
+
+const footerNav = [{ label: "Home", href: "#home" }, ...navLinks];
 
 export function Footer() {
   return (
@@ -24,7 +27,7 @@ export function Footer() {
               Navigate
             </h2>
             <ul className="mt-4 space-y-2.5">
-              {navLinks.map((link) => (
+              {footerNav.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -39,9 +42,25 @@ export function Footer() {
 
           <div>
             <h2 className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-ink-muted">
-              Elsewhere
+              Get in touch
             </h2>
             <ul className="mt-4 space-y-2.5">
+              <li>
+                <a
+                  href={mailto}
+                  className="break-all text-[0.9375rem] text-ink-soft transition-colors duration-200 hover:text-ink"
+                >
+                  {contact.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={telHref}
+                  className="text-[0.9375rem] text-ink-soft transition-colors duration-200 hover:text-ink"
+                >
+                  {contact.phoneDisplay}
+                </a>
+              </li>
               {externalLinks.map((link) => (
                 <li key={link.label}>
                   <a
@@ -54,14 +73,6 @@ export function Footer() {
                   </a>
                 </li>
               ))}
-              <li>
-                <a
-                  href={`mailto:${site.email}`}
-                  className="text-[0.9375rem] text-ink-soft transition-colors duration-200 hover:text-ink"
-                >
-                  Email
-                </a>
-              </li>
             </ul>
           </div>
         </div>
@@ -72,7 +83,14 @@ export function Footer() {
           </p>
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
             {apps.map((app) => (
-              <li key={app.slug}>{app.name}</li>
+              <li key={app.slug}>
+                <a
+                  href={app.projectUrl}
+                  className="transition-colors duration-200 hover:text-ink"
+                >
+                  {app.name}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
