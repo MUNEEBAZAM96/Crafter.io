@@ -11,14 +11,14 @@
 
 /** Entrance choreography for the hero, in ms after first paint. */
 export const HERO_SEQUENCE = {
-  navbar: 100,
-  badge: 150,
-  headlineLineOne: 250,
-  headlineLineTwo: 340,
-  description: 430,
-  actions: 520,
-  visual: 500,
-  footnote: 640,
+  navbar: 0,
+  badge: 60,
+  headlineLineOne: 120,
+  headlineLineTwo: 190,
+  description: 260,
+  actions: 330,
+  visual: 300,
+  footnote: 400,
 } as const;
 
 /** Stagger between siblings in a group. Fast enough not to feel like a queue. */

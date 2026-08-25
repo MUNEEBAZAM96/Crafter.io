@@ -27,8 +27,8 @@
 
   --duration-micro: 150ms;
   --duration-ui: 260ms;
-  --duration-reveal: 620ms;
-  --duration-hero: 820ms;
+  --duration-reveal: 520ms;
+  --duration-hero: 620ms;
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
@@ -261,12 +261,13 @@
 }
 
 @keyframes enter {
-  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  from { opacity: 1; transform: translateY(10px); filter: blur(2px); }
   to { opacity: 1; transform: none; filter: blur(0); }
 }
 
 @utility enter {
-  opacity: 0;
+  /* Keep the hero readable while staggered siblings wait their turn. */
+  opacity: 1;
   animation: enter var(--duration-hero) var(--ease-out-expo) forwards;
   animation-delay: var(--enter-delay, 0ms);
   will-change: transform, opacity, filter;
@@ -274,19 +275,16 @@
 
 @utility reveal {
   opacity: 0;
-  transform: translateY(35px);
-  filter: blur(4px);
+  transform: translateY(24px);
   transition:
     opacity var(--duration-reveal) var(--ease-out-expo),
-    transform var(--duration-reveal) var(--ease-out-expo),
-    filter var(--duration-reveal) var(--ease-out-expo);
+    transform var(--duration-reveal) var(--ease-out-expo);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
 @utility is-visible {
   opacity: 1;
   transform: none;
-  filter: blur(0);
 }
 
 @utility depth-layer {

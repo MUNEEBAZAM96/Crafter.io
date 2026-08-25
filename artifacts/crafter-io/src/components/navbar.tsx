@@ -1,6 +1,6 @@
 
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Menu, X } from "lucide-react";
 import { contact, mailto, navLinks } from "@/lib/data";
 import { HERO_SEQUENCE } from "@/lib/motion";
@@ -13,6 +13,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("#home");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
 
   // Condense the bar once the page starts moving.
   useEffect(() => {
@@ -22,26 +24,43 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Scroll-spy: highlight whichever section owns the upper third of the screen.
+  // Scroll-spy: highlight the last section whose start has crossed the reading
+  // marker. Unlike a narrow IntersectionObserver band, this still works for
+  // the final section when the browser cannot scroll it all the way to the
+  // top of the viewport.
   useEffect(() => {
     const sections = navLinks
       .map(({ href }) => document.querySelector(href))
       .filter((el): el is Element => Boolean(el));
 
-    if (!sections.length || typeof IntersectionObserver === "undefined") return;
+    if (!sections.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActive(`#${visible.target.id}`);
-      },
-      { rootMargin: "-20% 0px -65% 0px", threshold: [0, 0.25, 0.5] },
-    );
+    let frame: number | null = null;
+    const update = () => {
+      frame = null;
+      const marker = window.scrollY + Math.min(window.innerHeight * 0.3, 260);
+      let current = "#home";
 
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+      for (const section of sections) {
+        const top = section.getBoundingClientRect().top + window.scrollY;
+        if (top <= marker) current = `#${section.id}`;
+      }
+
+      setActive((previous) => (previous === current ? previous : current));
+    };
+    const schedule = () => {
+      if (frame === null) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Lock background scroll and wire Escape while the mobile sheet is open.
@@ -55,10 +74,15 @@ export function Navbar() {
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
+    const focusFrame = requestAnimationFrame(() => {
+      firstMenuLinkRef.current?.focus();
+    });
 
     return () => {
+      cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previous;
       window.removeEventListener("keydown", onKey);
+      menuButtonRef.current?.focus();
     };
   }, [open]);
 
@@ -94,6 +118,7 @@ export function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
+                onClick={() => setActive(link.href)}
                 aria-current={active === link.href ? "page" : undefined}
                 className={cn(
                   "relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors duration-200",
@@ -123,6 +148,7 @@ export function Navbar() {
           </Magnetic>
 
           <button
+            ref={menuButtonRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
@@ -154,7 +180,11 @@ export function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                onClick={() => setOpen(false)}
+                ref={i === 0 ? firstMenuLinkRef : undefined}
+                onClick={() => {
+                  setActive(link.href);
+                  setOpen(false);
+                }}
                 style={{ transitionDelay: open ? `${60 + i * 40}ms` : "0ms" }}
                 className={cn(
                   "flex items-center justify-between border-b border-line py-4 text-base font-medium",
