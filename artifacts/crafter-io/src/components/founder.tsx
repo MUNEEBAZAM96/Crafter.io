@@ -1,5 +1,5 @@
 import { Mail, Phone as PhoneIcon } from "lucide-react";
-import { contact, founder, mailto, telHref } from "@/lib/data";
+import { bookingUrl, contact, founder, mailto, telHref } from "@/lib/data";
 import { STAGGER } from "@/lib/motion";
 import { Container, Eyebrow } from "./ui/section";
 import { Reveal } from "./ui/reveal";
@@ -54,7 +54,7 @@ export function Founder() {
             <Reveal delay={220}>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Magnetic>
-                  <ButtonLink href="#contact">Start a Conversation</ButtonLink>
+                  <ButtonLink href={bookingUrl}>Start a Conversation</ButtonLink>
                 </Magnetic>
                 <Magnetic>
                   <LinkedInButton variant="secondary" />

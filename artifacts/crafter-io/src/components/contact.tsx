@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { ArrowRight, Mail, Phone as PhoneIcon } from "lucide-react";
-import { contact, mailto, social, telHref } from "@/lib/data";
+import { bookingUrl, contact, mailto, social, telHref } from "@/lib/data";
 import { STAGGER } from "@/lib/motion";
 import { ButtonLink } from "./ui/button";
 import { Container } from "./ui/section";
@@ -98,7 +98,7 @@ export function Contact() {
             >
               <Magnetic className="w-full sm:w-auto">
                 <ButtonLink
-                  href={mailto}
+                  href={bookingUrl}
                   size="lg"
                   variant="inverse"
                   className="group w-full sm:w-auto"

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { ArrowRight } from "lucide-react";
-import { apps, site } from "@/lib/data";
+import { apps, bookingUrl, site } from "@/lib/data";
 import { HERO_SEQUENCE, POINTER } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "./ui/button";
@@ -104,7 +104,7 @@ export function Hero() {
                 </ButtonLink>
               </Magnetic>
               <Magnetic>
-                <ButtonLink href="#contact" size="lg" variant="secondary">
+                <ButtonLink href={bookingUrl} size="lg" variant="secondary">
                   Let&apos;s Work Together
                 </ButtonLink>
               </Magnetic>

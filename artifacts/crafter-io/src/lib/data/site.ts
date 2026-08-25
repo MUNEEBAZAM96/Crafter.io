@@ -33,6 +33,8 @@ export const contact = {
 
 export const mailto = `mailto:${contact.email}`;
 export const telHref = `tel:${contact.phone}`;
+export const bookingUrl =
+  "https://calendar.notion.so/meet/muneebazam/un22h30fn";
 
 /* ------------------------------------------------------------------ */
 /* External profiles                                                   */

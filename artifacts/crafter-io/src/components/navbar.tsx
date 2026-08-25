@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Menu, X } from "lucide-react";
-import { contact, mailto, navLinks } from "@/lib/data";
+import { bookingUrl, contact, mailto, navLinks } from "@/lib/data";
 import { HERO_SEQUENCE } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "./ui/button";
@@ -142,7 +142,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Magnetic className="hidden sm:inline-flex">
-            <ButtonLink href="#contact" size="sm">
+            <ButtonLink href={bookingUrl} size="sm">
               Let&apos;s Talk
             </ButtonLink>
           </Magnetic>
@@ -203,7 +203,7 @@ export function Navbar() {
 
           <li className="flex flex-col gap-2 pt-5 pb-2">
             <ButtonLink
-              href="#contact"
+              href={bookingUrl}
               onClick={() => setOpen(false)}
               className="w-full"
             >
