@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Crafter.io"
+description = "A polished portfolio and product studio site for Crafter.io, showcasing its apps, approach, technology, founder story, and ways to start a conversation."
+version = "1.0.0"
+id = "artifacts/crafter-io"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23281
+
+[services.development]
+run = "pnpm --filter @workspace/crafter-io run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/crafter-io", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/crafter-io/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23281"
+BASE_PATH = "/"
